@@ -1,0 +1,4 @@
+---
+# tasks file for ansible-role-postgresql
+
+- include: install.yml

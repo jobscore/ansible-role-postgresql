@@ -1,0 +1,15 @@
+---
+# defaults file for ansible-role-postgresql
+
+postgresql_standby_mode: false
+postgresql_primary_ip: 'localhost'
+postgresql_user: 'postgres'
+postgresql_password: 'password'
+postgresql_version: '9.6.9'
+
+postgresql_tmp_dir: "/tmp/postgresql-{{ postgresql_version }}"
+
+postgresql_src_dir: /usr/local/pgsql
+
+postgresql_config_params: >
+  --disable-integer-datetimes --with-system-tzdata=/usr/share/zoneinfo
