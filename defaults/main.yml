@@ -31,3 +31,6 @@ postgresql_enable_replication: false
 postgresql_master_address: 'localhost'
 postgresql_replication_allowed_cidr: '0.0.0.0/0'
 postgresql_replication_user: "{{ postgresql_user }}"
+
+# Enable WAL archiving
+postgresql_enable_wal_archiving: true

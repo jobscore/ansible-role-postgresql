@@ -1,14 +1,6 @@
 ---
 # PostgreSQL installation
 
-# - set_fact:
-#     distro_packages: "{{ base_apt_packages }} + [ 'libreadline6' ]"
-#   when: ansible_distribution_release != 'bionic'
-#
-# - set_fact:
-#     distro_packages: "{{ base_apt_packages }} + [ 'libreadline7' ]"
-#   when: ansible_distribution_release == 'bionic'
-
 - name: Ensure the needed APT packages are present
   apt:
     name:
