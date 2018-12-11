@@ -2,7 +2,7 @@
 # tasks file for ansible-role-postgresql
 
 - name: Check if postgresql is installed
-  command: "{{postgresql_src_dir}}/bin/postgres --version"
+  command: "{{ postgresql_src_dir }}/bin/postgres --version"
   changed_when: false
   failed_when: false
   register: psql_check_cmd
@@ -14,7 +14,9 @@
 
 - name: Notify about existing PostgreSQL installation
   debug:
-    msg: "PostgreSQL won't be installed since another version is already present ({{ psql_check_cmd.stdout }})"
+    msg: >
+      PostgreSQL won't be installed since another version is already
+      present ({{ psql_check_cmd.stdout }})
   when: psql_check_cmd.rc == 0
 
 - include: install.yml
