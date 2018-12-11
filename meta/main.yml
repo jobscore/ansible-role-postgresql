@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  role_name: posgresql
+  role_name: postgresql
   author: Eric Magalhães
   description: An Ansible role for installing PostgreSQL from source on an Ubuntu box
   company: JobScore Inc
