@@ -91,6 +91,3 @@ host    all             all             ::1/128                 md5
 
 # Network connections:
 host    all             all             {{ postgresql_allowed_hosts }}         md5
-{% if postgresql_enable_replication %}
-host    replication     {{ postgresql_replication_user }}        {{ postgresql_replication_allowed_cidr }}              md5
-{% endif %}

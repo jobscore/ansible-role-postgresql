@@ -16,9 +16,7 @@
       - libssl-dev
       - libreadline-dev
       - libsystemd-dev
-      - python-psycopg2
     update_cache: true
-    cache_valid_time: 600
 
 - name: Ensure the postgresql user is created
   user:
@@ -26,7 +24,7 @@
     shell: /bin/bash
     create_home: true
 
-- name: Ensure the src dir is created
+- name: Ensure the src dir is present
   file:
     path: "{{ postgresql_src_dir }}"
     state: directory
@@ -128,21 +126,6 @@
     owner: "{{ postgresql_user }}"
     group: "{{ postgresql_user }}"
 
-- name: Ensure recovery.conf is present on slave node
-  template:
-    src: recovery.conf.j2
-    dest: "{{ postgresql_data_dir }}/recovery.conf"
-    mode: 0600
-    owner: "{{ postgresql_user }}"
-    group: "{{ postgresql_user }}"
-  when: not postgresql_master_node
-
-- name: Ensure recovery.conf is absent on master node
-  file:
-    path: "{{ postgresql_data_dir }}/recovery.conf"
-    state: absent
-  when: postgresql_master_node
-
 - name: Ensure postgresql socket dir is created
   file:
     path: "{{ postgresql_unix_socket_dir }}"
@@ -157,6 +140,7 @@
     src: "{{ postgresql_unix_socket_dir }}.s.PGSQL.{{ postgresql_port }}"
     dest: "/tmp/.s.PGSQL.{{ postgresql_port }}"
     force: true
+    follow: false
 
 - name: Ensure postgresql tmp files config is present
   copy:
@@ -186,13 +170,4 @@
     name: postgresql
     state: started
     enabled: true
-  when: postgresql_configure_systemd
-
-- name: Ensure the posgresql user password is set
-  become: true
-  become_user: "{{ postgresql_user }}"
-  postgresql_user:
-    name: "{{ postgresql_user }}"
-    password: "{{ postgresql_password }}"
-    role_attr_flags: SUPERUSER
   when: postgresql_configure_systemd

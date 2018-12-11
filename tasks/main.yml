@@ -1,6 +1,26 @@
 ---
 # tasks file for ansible-role-postgresql
 
+- name: Check if postgresql is installed
+  command: "{{postgresql_src_dir}}/bin/postgres --version"
+  changed_when: false
+  failed_when: false
+  register: psql_check_cmd
+
+- name: Decide wether or not install PostgreSQL
+  set_fact:
+    posgresql_install: false
+  when: psql_check_cmd.rc == 0
+
+- name: Notify about existing PostgreSQL installation
+  debug:
+    msg: "PostgreSQL won't be installed since another version is already present ({{ psql_check_cmd.stdout }})"
+  when: psql_check_cmd.rc == 0
+
 - include: install.yml
-- include: cron_wal_archive.yml
-  when: postgresql_enable_wal_archiving
+  when: postgresql_install
+
+- name: Ensure postgresql tmp dir is absent
+  file:
+    path: "{{ postgresql_tmp_dir }}"
+    state: absent
