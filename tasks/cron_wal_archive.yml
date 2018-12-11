@@ -1,0 +1,33 @@
+---
+- name: 'cron for moving WAL file to wal archival volume on master'
+  cron:
+    name="wal_archival_master"
+    hour="1,4,7,10,13,16,19,22"
+    minute="12"
+    job="find /pg/data/pg_xlogarch -maxdepth 1 -mmin '+60' -type f -exec mv '{}' /pg-archive/ \; -exec sleep 1.5 \;"
+    user="postgres"
+  when:
+    - pg_archive_enabled is defined and pg_archive_enabled
+    - not postgresql_standby_mode
+
+- name: 'cron for cleaning old files from wal archival volume on master'
+  cron:
+    name="wal_archival_clean_master"
+    hour="1,13"
+    minute="42"
+    job="find /pg-archive -maxdepth 1 -mtime '+5' -type f -exec rm '{}' \;"
+    user="postgres"
+  when:
+    - pg_archive_enabled is defined and pg_archive_enabled
+    - not postgresql_standby_mode
+
+- name: 'cron for cleaning wal files on the standby'
+  cron:
+    name="wal_archival_clean_standby"
+    hour="1,13"
+    minute="30"
+    job="find /pg/data/pg_xlogarch -maxdepth 1 -mtime '+2' -type f -exec rm '{}' \;"
+    user="postgres"
+  when:
+    - crontab_jobscore_enabled is defined and crontab_jobscore_enabled
+    - postgresql_standby_mode

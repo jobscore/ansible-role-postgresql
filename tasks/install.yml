@@ -56,33 +56,122 @@
     owner: "{{ postgresql_user}}"
     group: "{{ postgresql_user}}"
     remote_src: true
+    creates: "{{ postgresql_tmp_dir }}/configure"
     extra_opts:
      - --strip=1
 
-- name: Configure postgresql source install
+- name: Configure postgresql source
+  become_user: "{{ postgresql_user }}"
   command: ./configure {{ postgresql_config_params }} --prefix={{ postgresql_src_dir }} --with-openssl --with-systemd
   args:
     chdir: "{{ postgresql_tmp_dir }}"
     creates: "{{ postgresql_tmp_dir }}/GNUmakefile"
 
+- name: Build postgresql from source
+  become_user: "{{ postgresql_user }}"
+  command: make world -j4
+  args:
+    chdir: "{{ postgresql_tmp_dir }}"
+    creates: "{{ postgresql_tmp_dir }}/src/bin/psql/psql"
 
-# - name: Make postgresql source install
-#   command: make world -j4 chdir=/usr/local/src/postgresql-{{ postgresql_version }}
-#   args:
-#     creates: /usr/local/src/postgresql-{{ postgresql_version }}/src/bin/psql/psql
-#
-# - name: Install postgresql from built source
-#   command: make install-world chdir=/usr/local/src/postgresql-{{ postgresql_version }}
-#   args:
-#     creates: /pg/postgresql-{{ postgresql_version }}/bin/psql
+- name: Install postgresql
+  command: make install-world
+  args:
+    chdir: "{{ postgresql_tmp_dir }}"
+    creates: "{{ postgresql_src_dir }}/bin/psql"
 
-# - name: list postgresql binaries
-#   command: ls -1 /pg/postgresql-{{ postgresql_version }}/bin
-#   register: postgresql_binaries
-#   changed_when: false
-#   tags: postgresql-installation
+- name: Ensure needed ENV vars are set
+  copy:
+    dest: /etc/profile.d/100-postgresql.sh
+    content: |
+      export PATH={{ postgresql_src_dir }}/bin:$PATH
+      export LD_LIBRARY_PATH={{ postgresql_src_dir }}/lib
+      export MANPATH={{ postgresql_src_dir }}/share/man:$MANPATH
 
-# - name: add postgresql binaries to alternatives
-#   alternatives: name={{ item }} path=/pg/postgresql-{{ postgresql_version }}/bin/{{ item }} link=/usr/bin/{{ item }}
-#   with_items: postgresql_binaries.stdout_lines
-#   tags: postgresql-installation
+- name: Ensure postgresql data dir is created
+  file:
+    path: "{{ postgresql_data_dir }}"
+    state: directory
+    mode: 0755
+    owner: "{{ postgresql_user}}"
+    group: "{{ postgresql_user}}"
+
+- name: Initillize postgresql database
+  become_user: "{{ postgresql_user }}"
+  command: "{{ postgresql_src_dir }}/bin/initdb {{ postgresql_data_dir }}"
+  args:
+    creates: "{{ postgresql_data_dir }}/pg_hba.conf"
+
+- name: Ensure postgresql failover dir is created
+  file:
+    path: "{{ postgresql_data_dir }}/failover"
+    state: directory
+    mode: 0755
+    owner: "{{ postgresql_user}}"
+    group: "{{ postgresql_user}}"
+
+- name: Ensure postgresql archive dir is created
+  file:
+    path: "{{ postgresql_data_dir }}/pg_xlogarch"
+    state: directory
+    mode: 0755
+    owner: "{{ postgresql_user}}"
+    group: "{{ postgresql_user}}"
+
+- name: Ensure pg_hba.conf is updated
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgresql_data_dir }}/pg_hba.conf"
+    mode: 0600
+    owner: "{{ postgresql_user}}"
+    group: "{{ postgresql_user}}"
+
+- name: Ensure postgresql.conf is updated
+  template:
+    src: postgresql.conf.j2
+    dest: "{{ postgresql_data_dir }}/postgresql.conf"
+    mode: 0600
+    owner: "{{ postgresql_user}}"
+    group: "{{ postgresql_user}}"
+
+- name: Ensure recovery.conf is present on slave node
+  template:
+    src: recovery.conf.j2
+    dest: "{{ postgresql_data_dir }}/recovery.conf"
+    mode: 0600
+    owner: "{{ postgresql_user}}"
+    group: "{{ postgresql_user}}"
+  when: not postgresql_master_node
+
+- name: Ensure recovery.conf is absent on master node
+  file:
+    path: "{{ postgresql_data_dir }}/recovery.conf"
+    state: absent
+  when: postgresql_master_node
+
+- name: Ensure postgresql tmp files config is present
+  copy:
+    dest: /usr/lib/tmpfiles.d/postgresql.conf
+    mode: 0755
+    owner: root
+    group: root
+    content: |
+      d {{ postgresql_unix_socket_dir }} 0755 {{ postgresql_user }} {{ postgresql_user }} - -
+
+- name: Ensure postgresql systemd service file is present
+  template:
+    src: postgresql.service.j2
+    dest: /etc/systemd/system/postgresql.service
+    mode: 0664
+  register: change_postgresql_service
+
+- name: Reload the systemd daemon
+  systemd:
+    daemon_reload: true
+  when: change_postgresql_service is changed
+
+- name: Ensure the postgresql service is started and enabled
+  service:
+    name: postgresql
+    state: started
+    enabled: true
