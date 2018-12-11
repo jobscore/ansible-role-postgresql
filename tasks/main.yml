@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-role-postgresql
+
+- include: install.yml
+- include: cron_wal_archive.yml
+  when: postgresql_enable_wal_archiving

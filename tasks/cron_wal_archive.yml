@@ -1,0 +1,35 @@
+---
+- name: Ensure postgresql wal archive dir is present
+  file:
+    path: "{{ postgresql_archiving_path }}"
+    state: directory
+    mode: 0755
+    owner: "{{ postgresql_user}}"
+    group: "{{ postgresql_user}}"
+
+- name: 'cron for moving WAL file to wal archival volume on master'
+  cron:
+    name: "wal_archival_master"
+    hour: "1,4,7,10,13,16,19,22"
+    minute: "12"
+    job: "find {{ postgresql_data_dir }}/pg_xlogarch -maxdepth 1 -mmin '+60' -type f -exec mv '{}' {{ postgresql_archiving_path }}/ \\; -exec sleep 1.5 \\;"
+    user: "{{ postgresql_user }}"
+  when: postgresql_master_node
+
+- name: 'cron for cleaning old files from wal archival volume on master'
+  cron:
+    name: "wal_archival_clean_master"
+    hour: "1,13"
+    minute: "42"
+    job: "find {{ postgresql_archiving_path }} -maxdepth 1 -mtime '+5' -type f -exec rm '{}' \\;"
+    user: "{{ postgresql_user }}"
+  when: postgresql_master_node
+
+- name: 'cron for cleaning wal files on the standby'
+  cron:
+    name: "wal_archival_clean_standby"
+    hour: "1,13"
+    minute: "30"
+    job: "find {{ postgresql_data_dir }}/pg_xlogarch -maxdepth 1 -mtime '+2' -type f -exec rm '{}' \\;"
+    user: "{{ postgresql_user }}"
+  when: not postgresql_master_node

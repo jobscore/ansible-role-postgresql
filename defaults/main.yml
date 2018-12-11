@@ -1,0 +1,42 @@
+---
+# defaults file for ansible-role-postgresql
+
+postgresql_master_node: true
+postgresql_user: postgres
+postgresql_password: password
+postgresql_port: 5432
+postgresql_version: 9.6.9
+postgresql_allowed_hosts: 0.0.0.0/0
+
+postgresql_tmp_dir: "/tmp/postgresql-{{ postgresql_version }}"
+
+postgresql_src_dir: /usr/local/pgsql
+postgresql_data_dir: "{{ postgresql_src_dir }}/data"
+
+postgresql_configure_systemd: true
+
+postgresql_config_params: >
+  --disable-integer-datetimes --with-system-tzdata=/usr/share/zoneinfo
+  --with-python --with-perl
+
+
+# Configuration options
+postgresql_max_connections: 400
+postgresql_unix_socket_dir: /var/run/postgresql/
+postgresql_shared_buffers: '128MB'
+postgresql_work_mem: '1MB'
+postgresql_maintenance_work_mem: '16MB'
+postgresql_effective_cache_size: '128MB'
+postgresql_random_page_cost: '4.0'
+postgresql_gem_version: '0.18.2'
+
+
+# Replication specific configs
+postgresql_enable_replication: false
+postgresql_master_address: 'localhost'
+postgresql_replication_allowed_cidr: '0.0.0.0/0'
+postgresql_replication_user: "{{ postgresql_user }}"
+
+# Enable WAL archiving
+postgresql_enable_wal_archiving: false
+postgresql_archiving_path: /pg-archive
