@@ -50,9 +50,10 @@
     remote_src: true
     creates: "{{ postgresql_tmp_dir }}/configure"
     extra_opts:
-     - --strip=1
+      - '--strip=1'
 
 - name: Configure postgresql source
+  become: true
   become_user: "{{ postgresql_user }}"
   command: ./configure {{ postgresql_config_params }} --prefix={{ postgresql_src_dir }} --with-openssl --with-systemd
   args:
@@ -60,6 +61,7 @@
     creates: "{{ postgresql_tmp_dir }}/GNUmakefile"
 
 - name: Build postgresql from source
+  become: true
   become_user: "{{ postgresql_user }}"
   command: make world -j4
   args:
@@ -90,6 +92,7 @@
     group: "{{ postgresql_user}}"
 
 - name: Initillize postgresql database
+  become: true
   become_user: "{{ postgresql_user }}"
   command: "{{ postgresql_src_dir }}/bin/initdb -D {{ postgresql_data_dir }}"
   args:

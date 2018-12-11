@@ -19,15 +19,17 @@ postgresql_config_params: >
   --disable-integer-datetimes --with-system-tzdata=/usr/share/zoneinfo
   --with-python --with-perl
 
+
 # Configuration options
 postgresql_max_connections: 400
 postgresql_unix_socket_dir: /var/run/postgresql/
-postgresql_shared_buffers: '128MB' # 35% from the total memory is a good value
+postgresql_shared_buffers: '128MB'
 postgresql_work_mem: '1MB'
 postgresql_maintenance_work_mem: '16MB'
-postgresql_effective_cache_size: '128MB' # 95% from the total memory is a good value
+postgresql_effective_cache_size: '128MB'
 postgresql_random_page_cost: '4.0'
 postgresql_gem_version: '0.18.2'
+
 
 # Replication specific configs
 postgresql_enable_replication: false
