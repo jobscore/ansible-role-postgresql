@@ -1,3 +1,5 @@
+# {{ ansible_managed }}
+
 # Specifies whether to start the server as a standby. In streaming replication,
 # this parameter must to be set to on.
 standby_mode          = '{% if not postgresql_master_node %}on{% else %}off{% endif %}'

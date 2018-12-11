@@ -7,9 +7,9 @@ lint:
   name: yamllint
 platforms:
   - name: xenial
-    image: solita/ubuntu-systemd:xenial
+    image: ubuntu:xenial
   - name: bionic
-    image: solita/ubuntu-systemd:bionic
+    image: ubuntu:bionic
 provisioner:
   name: ansible
   lint:

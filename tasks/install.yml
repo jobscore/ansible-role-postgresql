@@ -84,29 +84,30 @@
   file:
     path: "{{ postgresql_data_dir }}"
     state: directory
-    mode: 0755
+    mode: 0700
+    recurse: true
     owner: "{{ postgresql_user}}"
     group: "{{ postgresql_user}}"
 
 - name: Initillize postgresql database
   become_user: "{{ postgresql_user }}"
-  command: "{{ postgresql_src_dir }}/bin/initdb {{ postgresql_data_dir }}"
+  command: "{{ postgresql_src_dir }}/bin/initdb -D {{ postgresql_data_dir }}"
   args:
     creates: "{{ postgresql_data_dir }}/pg_hba.conf"
 
 - name: Ensure postgresql failover dir is created
   file:
     path: "{{ postgresql_data_dir }}/failover"
+    mode: 0700
     state: directory
-    mode: 0755
     owner: "{{ postgresql_user}}"
     group: "{{ postgresql_user}}"
 
 - name: Ensure postgresql archive dir is created
   file:
     path: "{{ postgresql_data_dir }}/pg_xlogarch"
+    mode: 0700
     state: directory
-    mode: 0755
     owner: "{{ postgresql_user}}"
     group: "{{ postgresql_user}}"
 
@@ -141,14 +142,28 @@
     state: absent
   when: postgresql_master_node
 
+- name: Ensure postgresql socket dir is created
+  file:
+    path: "{{ postgresql_unix_socket_dir }}"
+    state: directory
+    mode: 0755
+    owner: "{{ postgresql_user}}"
+    group: "{{ postgresql_user}}"
+
+- name: Ensure socket symlink is present
+  file:
+    state: link
+    src: "{{ postgresql_unix_socket_dir }}.s.PGSQL.{{ postgresql_port }}"
+    dest: "/tmp/.s.PGSQL.{{ postgresql_port }}"
+    force: true
+
 - name: Ensure postgresql tmp files config is present
   copy:
     dest: /usr/lib/tmpfiles.d/postgresql.conf
     mode: 0755
-    owner: root
-    group: root
     content: |
       d {{ postgresql_unix_socket_dir }} 0755 {{ postgresql_user }} {{ postgresql_user }} - -
+      L /tmp/.s.PGSQL.{{ postgresql_port }} - - - - {{ postgresql_unix_socket_dir }}.s.PGSQL.{{ postgresql_port }}
 
 - name: Ensure postgresql systemd service file is present
   template:
@@ -156,14 +171,18 @@
     dest: /etc/systemd/system/postgresql.service
     mode: 0664
   register: change_postgresql_service
+  when: postgresql_configure_systemd
 
 - name: Reload the systemd daemon
   systemd:
     daemon_reload: true
-  when: change_postgresql_service is changed
+  when:
+    - change_postgresql_service is changed
+    - postgresql_configure_systemd
 
 - name: Ensure the postgresql service is started and enabled
   service:
     name: postgresql
     state: started
     enabled: true
+  when: postgresql_configure_systemd

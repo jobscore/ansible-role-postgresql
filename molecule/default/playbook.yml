@@ -4,3 +4,4 @@
   become: true
   roles:
     - role: ansible-role-postgresql
+      postgresql_configure_systemd: false

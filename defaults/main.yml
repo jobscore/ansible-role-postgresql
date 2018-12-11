@@ -13,8 +13,11 @@ postgresql_tmp_dir: "/tmp/postgresql-{{ postgresql_version }}"
 postgresql_src_dir: /usr/local/pgsql
 postgresql_data_dir: "{{ postgresql_src_dir }}/data"
 
+postgresql_configure_systemd: true
+
 postgresql_config_params: >
   --disable-integer-datetimes --with-system-tzdata=/usr/share/zoneinfo
+  --with-python --with-perl
 
 # Configuration options
 postgresql_max_connections: 400
@@ -33,4 +36,5 @@ postgresql_replication_allowed_cidr: '0.0.0.0/0'
 postgresql_replication_user: "{{ postgresql_user }}"
 
 # Enable WAL archiving
-postgresql_enable_wal_archiving: true
+postgresql_enable_wal_archiving: false
+postgresql_archiving_path: /pg-archive
