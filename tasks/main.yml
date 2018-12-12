@@ -9,14 +9,13 @@
 
 - name: Decide wether or not install PostgreSQL
   set_fact:
-    postgresql_install: false
-  when: psql_check_cmd.rc == 0
+    postgresql_install: "{% if psql_check_cmd.rc == 0 %}false{% else %}true{% endif %}"
 
 - name: Notify about existing PostgreSQL installation
   debug:
     msg: >
-      PostgreSQL won't be installed since another version is already
-      present ({{ psql_check_cmd.stdout }})
+      Another PostgreSQL is already
+      present - {{ psql_check_cmd.stdout }}
   when: not postgresql_install
 
 - include: install.yml
