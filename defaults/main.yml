@@ -1,6 +1,5 @@
 ---
 # defaults file for ansible-role-postgresql
-postgresql_install: true
 postgresql_user: postgres
 postgresql_port: 5432
 postgresql_version: 9.6.9
