@@ -4,4 +4,3 @@
   become: true
   roles:
     - role: ansible-role-postgresql
-      postgresql_enable_wal_archiving: true
