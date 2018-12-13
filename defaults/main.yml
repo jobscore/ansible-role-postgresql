@@ -11,6 +11,7 @@ postgresql_src_dir: /usr/local/pgsql
 postgresql_data_dir: "{{ postgresql_src_dir }}/data"
 
 postgresql_configure_systemd: true
+postgresql_start_service: true
 
 postgresql_config_params: >
   --disable-integer-datetimes --with-system-tzdata=/usr/share/zoneinfo

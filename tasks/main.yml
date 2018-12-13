@@ -21,7 +21,17 @@
 - include: install.yml
   when: postgresql_install
 
-- name: Ensure postgresql tmp dir is absent
+- include: configure.yml
+
+- name: Ensure the postgresql service is started
+  service:
+    name: postgresql
+    state: started
+  when:
+    - postgresql_configure_systemd
+    - postgresql_start_service
+
+- name: Ensure postgresql intall tmp dir is absent
   file:
     path: "{{ postgresql_tmp_dir }}"
     state: absent
