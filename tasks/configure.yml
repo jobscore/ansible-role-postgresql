@@ -1,0 +1,39 @@
+---
+# PostgreSQL config
+
+- name: Ensure postgresql data dir is created
+  file:
+    path: "{{ postgresql_data_dir }}"
+    state: directory
+    mode: 0700
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_user }}"
+
+- name: Ensure postgresql database is initialized
+  become: true
+  become_user: "{{ postgresql_user }}"
+  command: "{{ postgresql_src_dir }}/bin/initdb -D {{ postgresql_data_dir }}"
+  args:
+    creates: "{{ postgresql_data_dir }}/pg_hba.conf"
+
+- name: Ensure postgresql archive dir is created
+  file:
+    path: "{{ postgresql_data_dir }}/pg_xlogarch"
+    mode: 0700
+    state: directory
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_user }}"
+
+- name: Ensure pg_hba.conf is updated
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgresql_data_dir }}/pg_hba.conf"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_user }}"
+
+- name: Ensure postgresql.conf is updated
+  template:
+    src: postgresql.conf.j2
+    dest: "{{ postgresql_data_dir }}/postgresql.conf"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_user }}"
