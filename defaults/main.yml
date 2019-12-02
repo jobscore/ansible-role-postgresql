@@ -12,9 +12,10 @@ postgresql_data_dir: "{{ postgresql_src_dir }}/data"
 
 postgresql_configure_systemd: true
 postgresql_start_service: true
+postgresql_service_timeout: 300
 
 postgresql_config_params: >
-  --disable-integer-datetimes --with-system-tzdata=/usr/share/zoneinfo
+  --with-system-tzdata=/usr/share/zoneinfo
   --with-python --with-perl
 
 # Configuration options
