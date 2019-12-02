@@ -9,7 +9,7 @@ ExecStart={{ postgresql_src_dir }}/bin/postgres -D {{ postgresql_data_dir }}
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=mixed
 KillSignal=SIGINT
-TimeoutSec=90
+TimeoutSec={{ postgresql_service_timeout }}
 
 [Install]
 WantedBy=multi-user.target
