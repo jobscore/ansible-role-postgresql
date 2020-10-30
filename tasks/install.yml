@@ -110,7 +110,7 @@
     owner: "{{ item.pw_name }}"
     group: "{{ item.gr_name }}"
     state: link
-  when: psql_bins.files > 0
+  when: psql_bins.files|length > 0
   with_items: "{{ psql_bins.files }}"
 
 - name: Ensure postgresql tmp files config is present
