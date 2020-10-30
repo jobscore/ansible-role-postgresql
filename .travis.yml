@@ -7,11 +7,10 @@ services:
 before_install:
   - sudo apt-get -qq update
 install:
-  - pip install 'molecule[docker]'
-  - pip install docker
-  - pip install ansible
+  - pip install pipenv
+  - pipenv install --dev --system
 script:
-  - molecule test
+  - travis_wait 30 pipenv run molecule test
 notifications:
   email: false
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
