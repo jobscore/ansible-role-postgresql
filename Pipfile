@@ -4,13 +4,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-molecule = {extras = ["vagrant"],version = "*"}
-python-vagrant = "*"
 
 [packages]
-molecule = "*"
-docker-py = "*"
-ansible = ">=2.9.2"
+ansible = "*"
+molecule-docker = "*"
+testinfra = "*"
 
 [requires]
-python_version = "2.7"
+python_version = "3.7.5"
