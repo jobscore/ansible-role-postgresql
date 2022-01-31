@@ -39,6 +39,7 @@ galaxy_info:
       versions:
         - bionic
         - xenial
+        - focal
   # - name: SomePlatform
   #   versions:
   #   - all

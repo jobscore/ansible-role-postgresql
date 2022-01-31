@@ -31,7 +31,7 @@ Example Playbook
   become: true
   roles:
      - role: jobscore.postgresql
-       postgresql_version: 9.6.9
+       postgresql_version: 12.9
 ```
 License
 -------
@@ -41,4 +41,4 @@ License
 Author Information
 ------------------
 
-This role was created by [Eric Magalhães](https://emagalha.es) while working for [JobScore Inc](https://jobscore.com).
+This role was created by [Eric Magalhães](https://emagalha.es) and [Glauber Batista](https://glauberrbatista.dev) while working for [JobScore Inc](https://jobscore.com).

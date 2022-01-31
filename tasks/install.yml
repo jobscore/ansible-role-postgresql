@@ -12,11 +12,24 @@
       - gcc
       - zlib1g-dev
       - libperl-dev
-      - libpython-dev
       - libssl-dev
       - libreadline-dev
       - libsystemd-dev
     update_cache: true
+
+- name: Ensure libpython-dev is installed
+  apt:
+    name:
+      - libpython-dev
+    update_cache: true
+  when: ansible_distribution_release != 'focal'
+
+- name: Ensure libpython2-dev is installed
+  apt:
+    name:
+      - libpython2-dev
+    update_cache: true
+  when: ansible_distribution_release == 'focal'
 
 - name: Ensure the postgresql user is created
   user:

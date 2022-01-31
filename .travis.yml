@@ -1,19 +1,19 @@
 ---
-sudo: required
 language: python
-python: "3.8"
-services:
-  - docker
-before_install:
-  - sudo apt-get -qq update
+
+python:
+  - '3.9'
+
+os: linux
+dist: focal
+
 install:
-  - pip install pipenv
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' >ansible.cfg
   - pipenv install
+
 script:
-  - travis_wait 30 pipenv run molecule test
+  - pipenv run molecule test
+
 notifications:
-  email: false
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
-  slack:
-    rooms:
-      secure: iAG1gUSswTrX7xn9GWQ7/DF2yon0h/4iGQIIGwlgNkQQNcn1MTxKfDm+S790CdJ+03HMjE6r34abBcPTt91hHPj+/mGkDeP4XEtW8Rd+slOmuL2Pif4SGVqOIw2FtTnnemF+TZVpJpV8myP6qxdW7GCkZxk6XjYlEo8eqDC1805E1+uQ0LBmWUMfvj0NRwnD4j2ewhPiZW4J5EbuguytPQq9rgqCKBDKkG3GeX4sV6NYBlbC1L+aCX/dld2/gPitzNqpMHfG7FiH1HtMClOmmUTMMNaJFFZq5ceJu32J8oiEKzcwLbhJoT1otNwdIyd0Zs2xy5sAU/1paVp+WIjsHtdoj2WqlG7hQaVNtlZj3XkKcXaW12EoH2mb315+E5PBq5T20+phqtiB0COcOOgsMkHPoIl4bbOZ5ZwqmXtCCmNNXYzExBI3d17JnNSb2D+it/ye+qhRYppuqZYdddEYx4u0XXWfJlwcBoPt6hPMWrc7VvWJJ6zWbWEEnDBQNLEr56Nc98YlDBPTDOa5vZvU+/fYhT/yiKeso0IGC2194N+9uaht/7AmrWU7d5x6WNIiZJ81W/Sg3LAbnRfRW+2BCjXy5Fwe/GRU5qhLcV2Ek7KZz1BzxYwOBs0Tn2Zulko/3Kz1WJQ65msMCn36S621eJUJliPbEfsOW6unrSxl+zc=
