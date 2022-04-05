@@ -176,13 +176,13 @@ dynamic_shared_memory_type = posix	# the default is the first option
 
 # - Asynchronous Behavior -
 
-#effective_io_concurrency = 1		# 1-1000; 0 disables prefetching
+effective_io_concurrency = {{ postgresql_effective_io_concurrency }}		# 1-1000; 0 disables prefetching
 #maintenance_io_concurrency = 10	# 1-1000; 0 disables prefetching
-#max_worker_processes = 8		# (change requires restart)
-#max_parallel_maintenance_workers = 2	# taken from max_parallel_workers
-#max_parallel_workers_per_gather = 2	# taken from max_parallel_workers
+max_worker_processes = {{ postgresql_max_worker_processes }}		# (change requires restart)
+max_parallel_maintenance_workers = {{ postgresql_max_parallel_maintenance_workers }}	# taken from max_parallel_workers
+max_parallel_workers_per_gather = {{ postgresql_max_parallel_workers_per_gather }}	# taken from max_parallel_workers
 #parallel_leader_participation = on
-#max_parallel_workers = 8		# maximum number of max_worker_processes that
+max_parallel_workers = {{ postgresql_max_parallel_workers }}		# maximum number of max_worker_processes that
 					# can be used in parallel operations
 #old_snapshot_threshold = -1		# 1min-60d; -1 disables; 0 is immediate
 					# (change requires restart)
@@ -227,8 +227,8 @@ wal_buffers = 16MB			# min 32kB, -1 sets based on shared_buffers
 # - Checkpoints -
 
 #checkpoint_timeout = 5min		# range 30s-1d
-#max_wal_size = 1GB
-#min_wal_size = 80MB
+max_wal_size = {{ postgresql_max_wal_size }}
+min_wal_size = {{ postgresql_min_wal_size }}
 checkpoint_completion_target = 0.9	# checkpoint target duration, 0.0 - 1.0
 #checkpoint_flush_after = 256kB		# measured in pages, 0 disables
 #checkpoint_warning = 30s		# 0 disables
@@ -237,7 +237,7 @@ checkpoint_completion_target = 0.9	# checkpoint target duration, 0.0 - 1.0
 
 archive_mode = on		# enables archiving; off, on, or always
 				# (change requires restart)
-archive_command = 'test ! -f {{ postgresql_data_dir }}/pg_xlogarch/%f && cp %p {{ postgresql_data_dir }}/pg_xlogarch/%f'		# command to use to archive a logfile segment
+archive_command = 'test ! -f {{ postgresql_archive_dir }}/%f && cp %p {{ postgresql_archive_dir }}/%f'		# command to use to archive a logfile segment
 				# placeholders: %p = path of file to archive
 				#               %f = file name only
 				# e.g. 'test ! -f /mnt/server/archivedir/%f && cp %p /mnt/server/archivedir/%f'
@@ -248,7 +248,7 @@ archive_command = 'test ! -f {{ postgresql_data_dir }}/pg_xlogarch/%f && cp %p {
 
 # These are only used in recovery mode.
 
-restore_command = 'cp {{ postgresql_data_dir }}/pg_wal/%f "%p"'		# command to use to restore an archived logfile segment
+restore_command = 'cp {{ postgresql_archive_dir }}/%f "%p"'		# command to use to restore an archived logfile segment
 				# placeholders: %p = path of file to restore
 				#               %f = file name only
 				# e.g. 'cp /mnt/server/archivedir/%f %p'
@@ -378,7 +378,7 @@ max_standby_streaming_delay = {{ max_standby_streaming_delay }}	# max delay befo
 # - Planner Cost Constants -
 
 #seq_page_cost = 1.0			# measured on an arbitrary scale
-random_page_cost = 1.1			# same scale as above
+random_page_cost = {{ postgresql_random_page_cost }}			# same scale as above
 #cpu_tuple_cost = 0.01			# same scale as above
 #cpu_index_tuple_cost = 0.005		# same scale as above
 #cpu_operator_cost = 0.0025		# same scale as above
