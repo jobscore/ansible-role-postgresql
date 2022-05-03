@@ -7,7 +7,7 @@
   failed_when: false
   register: psql_check_cmd
 
-- name: Decide wether or not install PostgreSQL
+- name: Decide whether or not install PostgreSQL
   set_fact:
     postgresql_install: "{% if psql_check_cmd.rc == 0 %}false{% else %}true{% endif %}"
 

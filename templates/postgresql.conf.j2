@@ -326,7 +326,7 @@ hot_standby = on			# "off" disallows queries during recovery
 #max_standby_archive_delay = 30s	# max delay before canceling queries
 					# when reading WAL from archive;
 					# -1 allows indefinite delay
-max_standby_streaming_delay = {{ max_standby_streaming_delay }}	# max delay before canceling queries
+max_standby_streaming_delay = {{ postgresql_max_standby_streaming_delay }}	# max delay before canceling queries
 					# when reading streaming WAL;
 					# -1 allows indefinite delay
 #wal_receiver_create_temp_slot = off	# create temp slot if primary_slot_name
