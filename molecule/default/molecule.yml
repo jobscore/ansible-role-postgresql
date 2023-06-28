@@ -11,6 +11,8 @@ platforms:
     image: ubuntu:bionic
   - name: focal
     image: ubuntu:focal
+  - name: jammy
+    image: ubuntu:jammy
 provisioner:
   name: ansible
   lint:

@@ -2,7 +2,7 @@
 # defaults file for ansible-role-postgresql
 postgresql_user: postgres
 postgresql_port: 5432
-postgresql_version: 13.5
+postgresql_version: 15.3
 postgresql_allowed_hosts: 0.0.0.0/0
 
 postgresql_tmp_dir: "/tmp/postgresql-{{ postgresql_version }}"

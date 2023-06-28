@@ -17,19 +17,12 @@
       - libsystemd-dev
     update_cache: true
 
-- name: Ensure libpython-dev is installed
+- name: Ensure python packages are installed
   apt:
     name:
-      - libpython-dev
+      - libpython3-dev
+      - python3-distutils
     update_cache: true
-  when: ansible_distribution_release != 'focal'
-
-- name: Ensure libpython2-dev is installed
-  apt:
-    name:
-      - libpython2-dev
-    update_cache: true
-  when: ansible_distribution_release == 'focal'
 
 - name: Ensure the postgresql user is created
   user:
