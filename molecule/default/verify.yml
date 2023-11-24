@@ -1,0 +1,16 @@
+---
+- hosts: all
+  vars:
+    postgresql_version: 15.4
+  roles:
+    - role: ansible-role-postgresql
+      postgresql_configure_systemd: false
+  post_tasks:
+    - name: Check Postgres version
+      shell: "postgres --version"
+      register: version_check
+
+    - name: Ensure the right Postgres version is installed
+      fail:
+        msg: "The installed Postgres version is different from the expected. Expected {{ postgresql_version }} got {{ version_check.stdout }}"
+      when: postgresql_version|string not in version_check.stdout
