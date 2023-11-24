@@ -18,10 +18,10 @@
       present - {{ psql_check_cmd.stdout }}
   when: not postgresql_install
 
-- include: install.yml
+- include_tasks: install.yml
   when: postgresql_install
 
-- include: configure.yml
+- include_tasks: configure.yml
 
 - name: Ensure the postgresql service is started
   service:
