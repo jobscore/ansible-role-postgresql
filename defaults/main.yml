@@ -36,3 +36,4 @@ postgresql_maintenance_work_mem: '64MB'
 postgresql_effective_cache_size: '4GB'
 postgresql_random_page_cost: '4.0'
 postgresql_max_standby_streaming_delay: '30s'
+postgresql_autoprewarm_enabled: true
