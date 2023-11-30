@@ -1,7 +1,6 @@
-[![Build Status](https://travis-ci.org/jobscore/ansible-role-postgresql.svg?branch=master)](https://travis-ci.org/jobscore/ansible-role-postgresql)
-
 PostgreSQL
 =========
+[![CI](https://github.com/jobscore/ansible-role-postgresql/actions/workflows/ci.yml/badge.svg)](https://github.com/jobscore/ansible-role-postgresql/actions/workflows/ci.yml)
 
 An Ansible role for installing PostgreSQL from source on an Ubuntu box.
 
