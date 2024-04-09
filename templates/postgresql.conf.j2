@@ -141,7 +141,7 @@ max_stack_depth = 7MB			# min 100kB
 					#   sysv
 					#   windows
 					# (change requires restart)
-dynamic_shared_memory_type = posix	# the default is the first option
+dynamic_shared_memory_type = {{ postgresql_dynamic_shared_memory_type }}	# the default is the first option
 					# supported by the operating system:
 					#   posix
 					#   sysv
@@ -248,7 +248,7 @@ archive_command = 'test ! -f {{ postgresql_archive_dir }}/%f && cp %p {{ postgre
 
 # These are only used in recovery mode.
 
-restore_command = 'cp {{ postgresql_archive_dir }}/%f "%p"'		# command to use to restore an archived logfile segment
+restore_command = 'cp {{ postgresql_restore_dir }}/%f "%p"'		# command to use to restore an archived logfile segment
 				# placeholders: %p = path of file to restore
 				#               %f = file name only
 				# e.g. 'cp /mnt/server/archivedir/%f %p'

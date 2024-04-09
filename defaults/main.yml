@@ -2,7 +2,7 @@
 # defaults file for ansible-role-postgresql
 postgresql_user: postgres
 postgresql_port: 5432
-postgresql_version: 15.3
+postgresql_version: 15.4
 postgresql_allowed_hosts: 0.0.0.0/0
 
 postgresql_tmp_dir: "/tmp/postgresql-{{ postgresql_version }}"
@@ -10,6 +10,7 @@ postgresql_tmp_dir: "/tmp/postgresql-{{ postgresql_version }}"
 postgresql_src_dir: /usr/local/pgsql
 postgresql_data_dir: "{{ postgresql_src_dir }}/data"
 postgresql_archive_dir: "{{ postgresql_src_dir }}/archive"
+postgresql_restore_dir: "{{ postgresql_archive_dir }}"
 
 postgresql_effective_io_concurrency: 1
 postgresql_min_wal_size: 80MB
@@ -37,3 +38,4 @@ postgresql_effective_cache_size: '4GB'
 postgresql_random_page_cost: '4.0'
 postgresql_max_standby_streaming_delay: '30s'
 postgresql_autoprewarm_enabled: true
+postgresql_dynamic_shared_memory_type: 'posix'

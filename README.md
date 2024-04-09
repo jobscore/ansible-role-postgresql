@@ -12,8 +12,6 @@ None
 Role Variables
 --------------
 
-TBD
-
 Check `defaults/main.yml` for more info
 
 
@@ -30,7 +28,7 @@ Example Playbook
   become: true
   roles:
      - role: jobscore.postgresql
-       postgresql_version: 12.9
+       postgresql_version: 15.4
 ```
 License
 -------
