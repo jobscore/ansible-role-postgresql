@@ -10,6 +10,7 @@ postgresql_tmp_dir: "/tmp/postgresql-{{ postgresql_version }}"
 postgresql_src_dir: /usr/local/pgsql
 postgresql_data_dir: "{{ postgresql_src_dir }}/data"
 postgresql_archive_dir: "{{ postgresql_src_dir }}/archive"
+postgresql_restore_dir: "{{ postgresql_archive_dir }}"
 
 postgresql_effective_io_concurrency: 1
 postgresql_min_wal_size: 80MB
