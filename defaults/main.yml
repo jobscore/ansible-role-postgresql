@@ -36,11 +36,11 @@ postgresql_config_params: >
 # Configuration options
 postgresql_max_connections: 100
 postgresql_unix_socket_dir: /var/run/postgresql/
-postgresql_shared_buffers: '8MB'
-postgresql_work_mem: '4MB'
-postgresql_maintenance_work_mem: '64MB'
-postgresql_effective_cache_size: '4GB'
-postgresql_random_page_cost: '4.0'
-postgresql_max_standby_streaming_delay: '30s'
+postgresql_shared_buffers: "8MB"
+postgresql_work_mem: "4MB"
+postgresql_maintenance_work_mem: "64MB"
+postgresql_effective_cache_size: "4GB"
+postgresql_random_page_cost: "4.0"
+postgresql_max_standby_streaming_delay: "30s"
 postgresql_autoprewarm_enabled: true
-postgresql_dynamic_shared_memory_type: 'posix'
+postgresql_dynamic_shared_memory_type: "posix"
