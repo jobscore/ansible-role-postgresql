@@ -13,6 +13,7 @@ postgresql_archive_dir: "{{ postgresql_src_dir }}/archive"
 postgresql_restore_dir: "{{ postgresql_archive_dir }}"
 postgresql_archive_command: "test ! -f {{ postgresql_archive_dir }}/%f && cp %p {{ postgresql_archive_dir }}/%f"
 postgresql_restore_command: "cp {{ postgresql_restore_dir }}/%f %p"
+postgresql_primary_conninfo: ""
 
 postgresql_effective_io_concurrency: 1
 postgresql_min_wal_size: 80MB

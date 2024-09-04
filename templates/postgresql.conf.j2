@@ -318,7 +318,7 @@ wal_keep_size = 20480		# in megabytes; 0 disables
 
 # These settings are ignored on a master server.
 
-#primary_conninfo = ''			# connection string to sending server
+primary_conninfo = '{{ postgresql_primary_conninfo }}'			# connection string to sending server
 #primary_slot_name = ''			# replication slot on sending server
 #promote_trigger_file = ''		# file name whose presence ends recovery
 hot_standby = on			# "off" disallows queries during recovery
