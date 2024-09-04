@@ -17,6 +17,8 @@ postgresql_restore_command: "cp {{ postgresql_restore_dir }}/%f %p"
 postgresql_effective_io_concurrency: 1
 postgresql_min_wal_size: 80MB
 postgresql_max_wal_size: 1GB
+postgresql_wal_level: replica
+postgresql_max_wal_senders: 3
 postgresql_max_worker_processes: 8
 postgresql_max_parallel_workers: 8
 postgresql_max_parallel_maintenance_workers: 2
