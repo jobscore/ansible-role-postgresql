@@ -21,7 +21,7 @@
   apt:
     name:
       - libpython3-dev
-      - python3-distutils
+      - python3-setuptools
     update_cache: true
 
 - name: Ensure the postgresql user is created
@@ -55,7 +55,7 @@
     remote_src: true
     creates: "{{ postgresql_tmp_dir }}/configure"
     extra_opts:
-      - '--strip=1'
+      - "--strip=1"
 
 - name: Configure postgresql source
   become: true
