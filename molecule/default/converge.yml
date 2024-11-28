@@ -5,4 +5,4 @@
   roles:
     - role: ansible-role-postgresql
       postgresql_configure_systemd: false
-      postgresql_version: 15.4
+      postgresql_version: 17.2

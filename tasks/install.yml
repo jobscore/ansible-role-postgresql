@@ -15,6 +15,17 @@
       - libssl-dev
       - libreadline-dev
       - libsystemd-dev
+      - libicu-dev
+      - "libicu[0-9]*"
+      - pkg-config
+      - bison
+      - flex
+      - libxml2-utils
+      - docbook-xml
+      - docbook-xsl
+      - libxml2-utils
+      - xsltproc
+      - fop
     update_cache: true
 
 - name: Ensure python packages are installed
