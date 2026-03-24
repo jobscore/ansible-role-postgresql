@@ -28,7 +28,7 @@ Example Playbook
   become: true
   roles:
      - role: jobscore.postgresql
-       postgresql_version: 15.4
+       postgresql_version: 18.3
 ```
 License
 -------

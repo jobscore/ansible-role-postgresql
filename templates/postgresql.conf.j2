@@ -64,6 +64,7 @@ listen_addresses = '*'		# what IP address(es) to listen on;
 					# (change requires restart)
 port = {{ postgresql_port }}				# (change requires restart)
 max_connections = {{ postgresql_max_connections }}		# (change requires restart)
+#reserved_connections = 0		# (change requires restart)
 superuser_reserved_connections = 3	# (change requires restart)
 unix_socket_directories = '{{ postgresql_unix_socket_dir }}'	# comma-separated list of directories
 					# (change requires restart)
@@ -94,8 +95,10 @@ unix_socket_group = '{{ postgresql_user }}'			# (change requires restart)
 # - Authentication -
 
 #authentication_timeout = 1min		# 1s-600s
-#password_encryption = scram-sha-256	# scram-sha-256 or md5
+#password_encryption = scram-sha-256	# scram-sha-256 or (deprecated) md5
 #scram_iterations = 4096
+#md5_password_warnings = on		# display md5 deprecation warnings?
+#oauth_validator_libraries = ''	# comma-separated list of trusted validator modules
 
 # GSSAPI using Kerberos
 #krb_server_keyfile = 'FILE:${sysconfdir}/krb5.keytab'
@@ -110,9 +113,10 @@ unix_socket_group = '{{ postgresql_user }}'			# (change requires restart)
 #ssl_crl_file = ''
 #ssl_crl_dir = ''
 #ssl_key_file = 'server.key'
-#ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL'	# allowed SSL ciphers
+#ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL'	# allowed TLSv1.2 ciphers
+#ssl_tls13_ciphers = ''	# allowed TLSv1.3 cipher suites, blank for default
 #ssl_prefer_server_ciphers = on
-#ssl_ecdh_curve = 'prime256v1'
+#ssl_groups = 'X25519:prime256v1'
 #ssl_min_protocol_version = 'TLSv1.2'
 #ssl_max_protocol_version = ''
 #ssl_dh_params_file = ''
@@ -175,6 +179,12 @@ dynamic_shared_memory_type = {{ postgresql_dynamic_shared_memory_type }}	# the d
 #temp_file_limit = -1			# limits per-process temp file space
 					# in kilobytes, or -1 for no limit
 
+#file_copy_method = copy		# copy, clone (if supported by OS)
+#file_extend_method = posix_fallocate   # the default is the first option supported
+					# by the operating system:
+					#   posix_fallocate (most Unix-like systems)
+					#   write_zeros
+
 #max_notify_queue_pages = 1048576	# limits the number of SLRU pages allocated
 					# for NOTIFY / LISTEN queue
 
@@ -183,14 +193,6 @@ dynamic_shared_memory_type = {{ postgresql_dynamic_shared_memory_type }}	# the d
 #max_files_per_process = 1000		# min 64
 					# (change requires restart)
 
-# - Cost-Based Vacuum Delay -
-
-#vacuum_cost_delay = 0			# 0-100 milliseconds (0 disables)
-#vacuum_cost_page_hit = 1		# 0-10000 credits
-#vacuum_cost_page_miss = 2		# 0-10000 credits
-#vacuum_cost_page_dirty = 20		# 0-10000 credits
-#vacuum_cost_limit = 200		# 1-10000 credits
-
 # - Background Writer -
 
 #bgwriter_delay = 200ms			# 10-10000ms between rounds
@@ -198,12 +200,25 @@ dynamic_shared_memory_type = {{ postgresql_dynamic_shared_memory_type }}	# the d
 #bgwriter_lru_multiplier = 2.0		# 0-10.0 multiplier on buffers scanned/round
 #bgwriter_flush_after = 0		# measured in pages, 0 disables
 
-# - Asynchronous Behavior -
+# - I/O -
 
 #backend_flush_after = 0		# measured in pages, 0 disables
 effective_io_concurrency = {{ postgresql_effective_io_concurrency }}		# 1-1000; 0 disables prefetching
 #maintenance_io_concurrency = 10	# 1-1000; 0 disables prefetching
+#io_max_combine_limit = 128kB		# usually 1-128 blocks (depends on OS)
+					# (change requires restart)
 #io_combine_limit = 128kB		# usually 1-32 blocks (depends on OS)
+
+#io_method = worker			# worker, io_uring, sync
+					# (change requires restart)
+#io_max_concurrency = -1		# Max number of IOs that one process
+					# can execute simultaneously
+					# -1 sets based on shared_buffers
+					# (change requires restart)
+#io_workers = 3				# 1-32;
+
+# - Worker Processes -
+
 max_worker_processes = {{ postgresql_max_worker_processes }}		# (change requires restart)
 max_parallel_maintenance_workers = {{ postgresql_max_parallel_maintenance_workers }}	# limited by max_parallel_workers
 max_parallel_workers_per_gather = {{ postgresql_max_parallel_workers_per_gather }}	# limited by max_parallel_workers
@@ -252,7 +267,7 @@ wal_buffers = 16MB			# min 32kB, -1 sets based on shared_buffers
 
 #checkpoint_timeout = 5min		# range 30s-1d
 checkpoint_completion_target = 0.9	# checkpoint target duration, 0.0 - 1.0
-#checkpoint_flush_after = 256kB		# measured in pages, 0 disables
+#checkpoint_flush_after = 0		# measured in pages, 0 disables
 #checkpoint_warning = 30s		# 0 disables
 max_wal_size = {{ postgresql_max_wal_size }}
 min_wal_size = {{ postgresql_min_wal_size }}
@@ -330,12 +345,9 @@ max_wal_senders = {{ postgresql_max_wal_senders }}		# max number of walsender pr
 				# (change requires restart)
 #max_replication_slots = 10	# max number of replication slots
 				# (change requires restart)
-{% if postgresql_version | int < 13 %}
-wal_keep_segments = 1280        # in logfile segments, 16MB each; 0 disables
-{% else %}
 wal_keep_size = 20480		# in megabytes; 0 disables
-{% endif %}
 #max_slot_wal_keep_size = -1	# in megabytes; -1 disables
+#idle_replication_slot_timeout = 0	# in seconds; 0 disables
 #wal_sender_timeout = 60s	# in milliseconds; 0 disables
 #track_commit_timestamp = off	# collect timestamp of transaction commit
 				# (change requires restart)
@@ -383,6 +395,8 @@ max_standby_streaming_delay = {{ postgresql_max_standby_streaming_delay }}	# max
 
 # These settings are ignored on a publisher.
 
+#max_active_replication_origins = 10	# max number of active replication origins
+					# (change requires restart)
 #max_logical_replication_workers = 4	# taken from max_worker_processes
 					# (change requires restart)
 #max_sync_workers_per_subscription = 2	# taken from max_logical_replication_workers
@@ -417,6 +431,8 @@ max_standby_streaming_delay = {{ postgresql_max_standby_streaming_delay }}	# max
 #enable_sort = on
 #enable_tidscan = on
 #enable_group_by_reordering = on
+#enable_distinct_reordering = on
+#enable_self_join_elimination = on
 
 # - Planner Cost Constants -
 
@@ -580,9 +596,11 @@ log_autovacuum_min_duration = 1000	# log autovacuum activity;
 					# actions running at least this number
 					# of milliseconds.
 #log_checkpoints = on
-#log_connections = off
+#log_connections = '' # log aspects of connection setup
+          # options include receipt, authentication, authorization,
+          # setup_durations, and all to log all of these aspects
 #log_disconnections = off
-#log_duration = off
+#log_duration = off # log statement duration
 #log_error_verbosity = default		# terse, default, or verbose messages
 #log_hostname = off
 log_line_prefix = '%t:%r:%u@%d:[%p]:'		# special values:
@@ -591,6 +609,7 @@ log_line_prefix = '%t:%r:%u@%d:[%p]:'		# special values:
 					#   %d = database name
 					#   %r = remote host and port
 					#   %h = remote host
+					#   %L = local address
 					#   %b = backend type
 					#   %p = process ID
 					#   %P = process ID of parallel group leader
@@ -610,6 +629,7 @@ log_line_prefix = '%t:%r:%u@%d:[%p]:'		# special values:
 					#   %% = '%'
 					# e.g. '<%u%%%d> '
 #log_lock_waits = off			# log lock waits >= deadlock_timeout
+#log_lock_failures = off		# log lock failures
 #log_recovery_conflict_waits = off	# log standby recovery conflict waits
 					# >= deadlock_timeout
 #log_parameter_max_length = -1		# when logging statements, limit logged
@@ -641,6 +661,7 @@ log_timezone = 'UTC'
 #track_activities = on
 #track_activity_query_size = 1024	# (change requires restart)
 #track_counts = on
+#track_cost_delay_timing = off
 #track_io_timing = off
 #track_wal_io_timing = off
 #track_functions = none			# none, pl, all
@@ -657,32 +678,36 @@ log_timezone = 'UTC'
 
 
 #------------------------------------------------------------------------------
-# AUTOVACUUM
+# VACUUMING
 #------------------------------------------------------------------------------
+
+# - Automatic Vacuuming -
 
 autovacuum = on			# Enable autovacuum subprocess?  'on'
 					# requires track_counts to also be on.
-autovacuum_max_workers = 3		# max number of autovacuum subprocesses
+#autovacuum_worker_slots = 16		# autovacuum worker slots to allocate
 					# (change requires restart)
+autovacuum_max_workers = 3		# max number of autovacuum subprocesses
 autovacuum_naptime = 1min		# time between autovacuum runs
 autovacuum_vacuum_threshold = 1000	# min number of row updates before
 					# vacuum
-{% if postgresql_version | int >= 13 %}
 autovacuum_vacuum_insert_threshold = 1000	# min number of row inserts
-					# before vacuum; -1 disables insert
-					# vacuums
-{% endif %}
+						# before vacuum; -1 disables insert
+						# vacuums
 autovacuum_analyze_threshold = 500	# min number of row updates before
 					# analyze
 #autovacuum_vacuum_scale_factor = 0.2	# fraction of table size before vacuum
-#autovacuum_vacuum_insert_scale_factor = 0.2	# fraction of inserts over table
-					# size before insert vacuum
+#autovacuum_vacuum_insert_scale_factor = 0.2	# fraction of unfrozen pages
+          # before insert vacuum
 #autovacuum_analyze_scale_factor = 0.1	# fraction of table size before analyze
+#autovacuum_vacuum_max_threshold = 100000000    # max number of row updates
+						# before vacuum; -1 disables max
+						# threshold
 #autovacuum_freeze_max_age = 200000000	# maximum XID age before forced vacuum
 					# (change requires restart)
 #autovacuum_multixact_freeze_max_age = 400000000	# maximum multixact age
-					# before forced vacuum
-					# (change requires restart)
+							# before forced vacuum
+							# (change requires restart)
 #autovacuum_vacuum_cost_delay = 2ms	# default vacuum cost delay for
 					# autovacuum, in milliseconds;
 					# -1 means use vacuum_cost_delay
@@ -690,6 +715,27 @@ autovacuum_analyze_threshold = 500	# min number of row updates before
 					# autovacuum, -1 means use
 					# vacuum_cost_limit
 
+# - Cost-Based Vacuum Delay -
+
+#vacuum_cost_delay = 0			# 0-100 milliseconds (0 disables)
+#vacuum_cost_page_hit = 1		# 0-10000 credits
+#vacuum_cost_page_miss = 2		# 0-10000 credits
+#vacuum_cost_page_dirty = 20		# 0-10000 credits
+#vacuum_cost_limit = 200		# 1-10000 credits
+
+# - Default Behavior -
+
+#vacuum_truncate = on			# enable truncation after vacuum
+
+# - Freezing -
+
+#vacuum_freeze_table_age = 150000000
+#vacuum_freeze_min_age = 50000000
+#vacuum_failsafe_age = 1600000000
+#vacuum_multixact_freeze_table_age = 150000000
+#vacuum_multixact_freeze_min_age = 5000000
+#vacuum_multixact_failsafe_age = 1600000000
+#vacuum_max_eager_freeze_failure_rate = 0.03 # 0 disables eager scanning
 
 #------------------------------------------------------------------------------
 # CLIENT CONNECTION DEFAULTS
@@ -724,12 +770,6 @@ autovacuum_analyze_threshold = 500	# min number of row updates before
 #lock_timeout = 0			# in milliseconds, 0 is disabled
 #idle_in_transaction_session_timeout = 0	# in milliseconds, 0 is disabled
 #idle_session_timeout = 0			# in milliseconds, 0 is disabled
-#vacuum_freeze_table_age = 150000000
-#vacuum_freeze_min_age = 50000000
-#vacuum_failsafe_age = 1600000000
-#vacuum_multixact_freeze_table_age = 150000000
-#vacuum_multixact_freeze_min_age = 5000000
-#vacuum_multixact_failsafe_age = 1600000000
 #bytea_output = 'hex'			# hex, escape
 #xmlbinary = 'base64'
 #xmloption = 'content'
@@ -777,6 +817,7 @@ shared_preload_libraries = 'pg_stat_statements,pg_prewarm'	# (change requires re
 # - Other Defaults -
 
 #dynamic_library_path = '$libdir'
+#extension_control_path = '$system'
 #gin_fuzzy_search_limit = 0
 
 
