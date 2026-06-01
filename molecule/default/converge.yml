@@ -3,6 +3,6 @@
   hosts: all
   become: true
   roles:
-    - role: ansible-role-postgresql
+    - role: jobscore.postgresql
       postgresql_configure_systemd: false
       postgresql_version: 18.3
