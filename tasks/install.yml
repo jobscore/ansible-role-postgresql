@@ -56,6 +56,7 @@
     mode: 0755
     owner: "{{ postgresql_user }}"
     group: "{{ postgresql_user }}"
+  changed_when: false
 
 - name: Get postgresql source code
   unarchive:
@@ -67,6 +68,7 @@
     creates: "{{ postgresql_tmp_dir }}/configure"
     extra_opts:
       - "--strip=1"
+  changed_when: false
 
 - name: Configure postgresql source
   become: true
@@ -77,6 +79,7 @@
   args:
     chdir: "{{ postgresql_tmp_dir }}"
     creates: "{{ postgresql_tmp_dir }}/GNUmakefile"
+  changed_when: false
 
 - name: Build postgresql from source
   become: true
@@ -85,6 +88,7 @@
   args:
     chdir: "{{ postgresql_tmp_dir }}"
     creates: "{{ postgresql_tmp_dir }}/src/bin/psql/psql"
+  changed_when: false
 
 - name: Install postgresql
   command: make install-world
