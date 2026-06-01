@@ -8,8 +8,6 @@ lint: |
   set -e
   yamllint .
 platforms:
-  - name: focal
-    image: ubuntu:focal
   - name: jammy
     image: ubuntu:jammy
   - name: noble
