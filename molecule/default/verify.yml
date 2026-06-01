@@ -3,7 +3,7 @@
   vars:
     postgresql_version: 18.3
   roles:
-    - role: ansible-role-postgresql
+    - role: jobscore.postgresql
       postgresql_configure_systemd: false
   post_tasks:
     - name: Check Postgres version

@@ -35,3 +35,4 @@
   file:
     path: "{{ postgresql_tmp_dir }}"
     state: absent
+  changed_when: false
