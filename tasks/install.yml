@@ -72,6 +72,8 @@
   become: true
   become_user: "{{ postgresql_user }}"
   command: ./configure {{ postgresql_config_params }} --prefix={{ postgresql_src_dir }} --with-openssl --with-systemd
+  environment:
+    CFLAGS: "{{ postgresql_build_cflags }}"
   args:
     chdir: "{{ postgresql_tmp_dir }}"
     creates: "{{ postgresql_tmp_dir }}/GNUmakefile"
