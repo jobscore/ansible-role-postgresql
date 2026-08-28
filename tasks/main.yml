@@ -2,29 +2,31 @@
 # tasks file for ansible-role-postgresql
 
 - name: Check if postgresql is installed
-  command: "{{ postgresql_src_dir }}/bin/postgres --version"
+  ansible.builtin.command: "{{ postgresql_src_dir }}/bin/postgres --version"
   changed_when: false
   failed_when: false
   register: psql_check_cmd
 
 - name: Decide whether or not install PostgreSQL
-  set_fact:
+  ansible.builtin.set_fact:
     postgresql_install: "{% if psql_check_cmd.rc == 0 %}false{% else %}true{% endif %}"
 
 - name: Notify about existing PostgreSQL installation
-  debug:
+  ansible.builtin.debug:
     msg: >
       Another PostgreSQL is already
       present - {{ psql_check_cmd.stdout }}
-  when: not postgresql_install
+  when: not postgresql_install | bool
 
-- include_tasks: install.yml
-  when: postgresql_install
+- name: Install PostgreSQL
+  ansible.builtin.include_tasks: install.yml
+  when: postgresql_install | bool
 
-- include_tasks: configure.yml
+- name: Configure PostgreSQL
+  ansible.builtin.include_tasks: configure.yml
 
 - name: Ensure the postgresql service is started
-  service:
+  ansible.builtin.service:
     name: postgresql
     state: started
   when:
@@ -32,7 +34,7 @@
     - postgresql_start_service
 
 - name: Ensure postgresql intall tmp dir is absent
-  file:
+  ansible.builtin.file:
     path: "{{ postgresql_tmp_dir }}"
     state: absent
   changed_when: false
