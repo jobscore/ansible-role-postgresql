@@ -12,6 +12,8 @@ platforms:
     image: ubuntu:jammy
   - name: noble
     image: ubuntu:noble
+  - name: resolute
+    image: ubuntu:resolute
 provisioner:
   name: ansible
   lint:

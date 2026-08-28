@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Verify
+  hosts: all
   vars:
     postgresql_version: 18.3
   roles:
@@ -7,10 +8,11 @@
       postgresql_configure_systemd: false
   post_tasks:
     - name: Check Postgres version
-      shell: "postgres --version"
+      ansible.builtin.command: "postgres --version"
       register: version_check
+      changed_when: false
 
     - name: Ensure the right Postgres version is installed
-      fail:
+      ansible.builtin.fail:
         msg: "The installed Postgres version is different from the expected. Expected {{ postgresql_version }} got {{ version_check.stdout }}"
-      when: postgresql_version|string not in version_check.stdout
+      when: postgresql_version | string not in version_check.stdout
